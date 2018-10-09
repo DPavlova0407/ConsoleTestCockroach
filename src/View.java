@@ -2,10 +2,11 @@ import javax.swing.*;
 import java.awt.*;
 
 public class View extends JFrame {
-    private static int WIDTH = 1000;
-    private static int HEIGHT = 520;
+    private static final int WIDTH = 1000;
+    private static final int HEIGHT = 520;
 
     private Game game;
+    private int numberOfTracks;
 
     private JPanel panel;
     private JScrollPane scrollPaneText;
@@ -13,19 +14,39 @@ public class View extends JFrame {
     private JButton button;
     private JTextField textField;
     private JTextField raceLeader;
-    private List names;
 
-    public View(int numberOfTracks){
+    public View(int numberOfTracks) {
+        this.numberOfTracks = numberOfTracks;
+        createContent();
+        createGame();
+        createNamePanel();
+        addContentAndPack();
+    }
+
+    public Game getGame() {
+        return game;
+    }
+
+    public JButton getButton() {
+        return button;
+    }
+
+    public void createContent() {
         setTitle("Races");
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
 
         raceLeader = new JTextField("Все тараканы на старте");
         raceLeader.setEditable(false);
 
+        button = new JButton("Start");
+    }
+
+    public void createGame() {
         game = new Game(numberOfTracks, raceLeader);
         scrollPaneGame = new JScrollPane(game);
+    }
 
-        /*name panel*/
+    public void createNamePanel() {
         panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         for (int i = 1; i < numberOfTracks + 1; i++) {
@@ -35,10 +56,9 @@ public class View extends JFrame {
             panel.add(textField);
         }
         scrollPaneText = new JScrollPane(panel);
-        /**/
+    }
 
-        button = new JButton("Start");
-
+    public void addContentAndPack() {
         getContentPane().add(button, BorderLayout.NORTH);
         getContentPane().add(scrollPaneGame, BorderLayout.CENTER);
         getContentPane().add(scrollPaneText, BorderLayout.WEST);
@@ -49,13 +69,5 @@ public class View extends JFrame {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
-    }
-
-    public Game getGame() {
-        return game;
-    }
-
-    public JButton getButton() {
-        return button;
     }
 }

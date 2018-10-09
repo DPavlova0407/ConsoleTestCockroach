@@ -4,31 +4,42 @@ import java.awt.event.ActionListener;
 public class Controller {
     private View view;
 
-    public Controller(View viewN){
+    public Controller(View viewN) {
         view = viewN;
         view.getButton().addActionListener(new Button());
     }
+
     class Button implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
             // при нажатии на кнопку во время забега, забег будет остановлен
             // для начала нового забега повторно нажать на кнопку
-            if (view.getGame().isGameStarted()){
-                // убить потоки
-                // вернуть изначальное состояние
-                for (Cockroach c : view.getGame().getCockroaches()) {
-                    c.stopCockroachThread();
-                    //System.out.println("поток остановлен--------------------------Controller");
-                }
-                System.out.println("Забег был прерван");
-                //восстановить картинку
-                view.getGame().repaint();
-                view.getGame().delFinished();
-                view.getGame().setGameStarted(false);
+            if (view.getGame().isGameStarted()) {
+                raceInterrupted();
             } else {
                 view.getGame().run();// по нажатию кнопки запустить забег
             }
+        }
+
+        private void raceInterrupted() {
+            // убить потоки и обнулить координаты
+            reloadCockroaches();
+            System.out.println("Забег был прерван");
+            //восстановить картинку
+            reloadGame();
+        }
+
+        private void reloadCockroaches() {
+            for (Cockroach c : view.getGame().getCockroaches()) {
+                c.stopCockroachThread();
+            }
+        }
+
+        private void reloadGame() {
+            view.getGame().repaint();
+            view.getGame().delFinished();
+            view.getGame().setGameStarted(false);
         }
     }
 }

@@ -1,21 +1,20 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.ImageObserver;
-import java.text.AttributedCharacterIterator;
 import java.util.Random;
 
-public class Cockroach extends JPanel implements Runnable{
+public class Cockroach extends JPanel implements Runnable {
     private Thread cockroachThread;
-    private int coordX, coordY;
     private String name;
-    private int finishX;
     private Random random;
     private Game game;
-
+    private Image cockroachImg;
+    private int coordX, coordY;
+    private int finishX;
     private boolean finished = false;
 
-    public Cockroach(String name, int x, int y, int finish, Game game){
+    public Cockroach(String name, int x, int y, int finish, Game game) {
         random = new Random();
+        this.cockroachImg = readImage();
         this.name = name;
         this.coordX = x;
         this.coordY = y;
@@ -23,12 +22,57 @@ public class Cockroach extends JPanel implements Runnable{
         this.game = game;
     }
 
-    private int generateShift(){
-       // return (int) Math.sqrt(random.nextInt(100));
+    @Override
+    public void run() {
+        while (coordX < finishX) {
+            try {
+                makeStep();
+            } catch (InterruptedException e) {
+                System.out.println("поток прерван");
+            }
+        }
+        ifNewFinisher();
+    }
+
+    private void makeStep() throws InterruptedException {
+        game.repaint();
+        step();
+        //print();//---
+        Thread.sleep(1000);
+    }
+
+    private void showWinner() {
+        if (game.getFinished() == 1)
+            System.out.println("таракан " + getName() + " ПОБЕДИЛ - x = " + getCoordX() + " finish = " + getFinishX());
+    }
+
+    private void ifNewFinisher() {
+        if (coordX >= finishX) {
+            System.out.println("таракан " + getName() + " финишировал - x = " + getCoordX() + " finish = " + getFinishX());//---
+            finished = true;
+            game.addFinisher();
+            showWinner();
+            ifAllFinished();
+            stopCockroachThread();
+        }
+    }
+
+    private void ifAllFinished() {
+        if (game.getFinished() == game.getNumberOfTracks()) {
+            game.delFinished();
+            System.out.println("все тараканы финишировали");
+            // восстановить изображение
+            game.repaint();
+            game.setGameStarted(false);
+        }
+    }
+
+    private int generateShift() {
+        // return (int) Math.sqrt(random.nextInt(100));
         return random.nextInt(100);
     }
 
-    public void step(){
+    public void step() {
         coordX += generateShift();
     }
 
@@ -44,47 +88,17 @@ public class Cockroach extends JPanel implements Runnable{
         return name;
     }
 
-    @Override
-    public void run() {
-        try {
-            while (coordX < finishX) {
-                game.repaint();
-                step();
-                //print();//---
-                Thread.sleep(1000);
-            }
-            if (coordX >= finishX) {
-                System.out.println("таракан " + getName() + " финишировал - x = " + getCoordX() + " finish = " + getFinishX());//---
-                finished = true;
-                game.addFinisher();
-                //System.out.println(game.getFinished());
-                if (game.getFinished() == 1)
-                    System.out.println("таракан " + getName() + " ПОБЕДИЛ - x = " + getCoordX() + " finish = " + getFinishX());
-                if (game.getFinished() == game.getNumberOfTracks()) {
-                    game.delFinished();
-                    System.out.println("все тараканы финишировали");
-                    // восстановить изображение
-                    game.repaint();
-                    game.setGameStarted(false);
-                }
-                setInStartPosition();
-                // убить поток текущего таракана
-                stopCockroachThread();
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+    public Image readImage() {
+        ImageIcon cockroachIcon = new ImageIcon(this.getClass().getResource("cockroach.jpg"));
+        return cockroachIcon.getImage();
     }
 
-    public void paint(Graphics g){
+    public void paint(Graphics g) {
         // перерисовать таракана из его текущих координат
-        ImageIcon cockroachIcon = new ImageIcon(this.getClass().getResource("cockroach.jpg"));
-        Image cockroachImg = cockroachIcon.getImage();
-
         g.drawImage(cockroachImg, getCoordX(), getCoordY(), null);
     }
 
-    private void print(){
+    private void print() {
         System.out.println("( " + name + " " + coordX + " )");
     }
 
@@ -95,23 +109,25 @@ public class Cockroach extends JPanel implements Runnable{
     public int getFinishX() {
         return finishX;
     }
-    public void setInStartPosition(){
+
+    public void setInStartPosition() {
         this.coordX = 0;
     }
 
     public void setCockroachThread() {
         this.cockroachThread = new Thread(this);
     }
-    public void stopCockroachThread(){
-        cockroachThread.stop();
+
+    public void stopCockroachThread() {
+        // остановить поток и обнулить координаты
         setInStartPosition();
+        cockroachThread.stop();
     }
 
     public boolean isFinished() {
         return finished;
     }
 
-    @Override
     public void setName(String name) {
         this.name = name;
     }
