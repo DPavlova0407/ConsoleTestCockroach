@@ -1,3 +1,8 @@
+package controller;
+
+import core.Cockroach;
+import visual.View;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 

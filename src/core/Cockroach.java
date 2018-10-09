@@ -1,6 +1,10 @@
+package core;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Cockroach extends JPanel implements Runnable {
     private Thread cockroachThread;
@@ -9,7 +13,7 @@ public class Cockroach extends JPanel implements Runnable {
     private Game game;
     private Image cockroachImg;
     private int coordX, coordY;
-    private int finishX;
+    private static int finishX;
     private boolean finished = false;
 
     public Cockroach(String name, int x, int y, int finish, Game game) {
@@ -28,7 +32,9 @@ public class Cockroach extends JPanel implements Runnable {
             try {
                 makeStep();
             } catch (InterruptedException e) {
-                System.out.println("поток прерван");
+                //System.out.println("поток прерван");
+                Logger.getLogger(this.getClass().getName())
+                        .log(Level.SEVERE, null, e);
             }
         }
         ifNewFinisher();
@@ -89,8 +95,7 @@ public class Cockroach extends JPanel implements Runnable {
     }
 
     public Image readImage() {
-        ImageIcon cockroachIcon = new ImageIcon(this.getClass().getResource("cockroach.jpg"));
-        return cockroachIcon.getImage();
+        return Toolkit.getDefaultToolkit().createImage(getClass().getResource("/resources/cockroach.jpg"));
     }
 
     public void paint(Graphics g) {

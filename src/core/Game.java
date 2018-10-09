@@ -1,5 +1,8 @@
+package core;
+
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -95,8 +98,7 @@ public class Game extends JPanel implements Runnable {
     public void initGame(int numberOfTracks, JTextField leader) {
         this.numberOfTracks = numberOfTracks;
         this.raceLeader = leader;
-        ImageIcon finishIcon = new ImageIcon(this.getClass().getResource("finish.jpg"));
-        finishImg = finishIcon.getImage();
+        finishImg = Toolkit.getDefaultToolkit().createImage(getClass().getResource("/resources/finish.jpg"));
     }
 
     public void calculateHeight() {
@@ -143,7 +145,7 @@ public class Game extends JPanel implements Runnable {
     }
 
     /*public void checkNames(){
-        for (Cockroach c : cockroaches) {
+        for (core.Cockroach c : cockroaches) {
 
         }
     }*/

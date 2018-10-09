@@ -1,3 +1,7 @@
+package visual;
+
+import core.Game;
+
 import javax.swing.*;
 import java.awt.*;
 
